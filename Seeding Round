@@ -25,7 +25,7 @@ int gWall = 2200;
 int lineL = 3800;
 int sideLight = 5;
 int tooClose = 2900;
-int tooFar = 2100;
+int tooFar = 2200;
 int midLight = 2;
 int count = 0;
 int turnPause = 1750;
@@ -69,13 +69,35 @@ void wait();
 
 int main(){
 	//wait for light();
-	//shut_down_in(120.0);
+	shut_down_in(120.0);
 	enable_servos();
     //STEP 1
     open_claw();
 	claw_up_max(); 
 	printf("set-up complete!\n");
-    
+    // maybe step
+    close_claw_green();
+    msleep(100);
+    left_turn();
+    msleep(turnPause);
+    wait();
+    //claw down to orange
+    claw_down_orange();
+    msleep(500);
+  
+    //right turn
+    right_turn();
+    msleep(1000);
+    wait();
+    // claw up
+    claw_up_max();
+    msleep(500);
+    // face botguy
+    right_turn();
+    msleep(800);
+    wait();
+    open_claw();
+    msleep(100);
     //STEP 2
     grab_and_up();
     printf("picked up botguy\n");
@@ -92,13 +114,16 @@ int main(){
     printf("time to take him to the shelter\n");
 
     //STEP 4
-    while(analog(clawFrontSens) <= gWall){
+    while(analog(clawFrontSens) <= gWall || count <= 300){
     	forward();
+        count++;
         if(analog(side) < tooFar){
         	adjustR();
+                count++;
 		}
         if(analog(side) > tooClose){
 			adjustL();
+                        count++;
 		}
     }
     wait();
@@ -116,7 +141,7 @@ int main(){
     //adjustR();
     //wait();
     pivot_left_turn();
-    msleep(550); // finish adjusting here
+    msleep(500); // finish adjusting here
     wait();
     while(analog(sideLight) <= lineL){
 	back();
@@ -124,8 +149,8 @@ int main(){
     wait(); // at the line
     left_turn();
     msleep(turnPause);
-    wait();
-    printf("finally at black line. time to go to the hydrogen tank\n");
+    wait(); // facing the hydro tank
+    printf("in line with the hydrogen tank. time to knock it down\n");
     
     //STEP 7
     claw_down_orange();
@@ -284,27 +309,27 @@ void back(){
 void forward(){
 	motor(lmotor,speed);
 	motor(rmotor,speed);
-	printf("moving forwards\n");
+	//printf("moving forwards\n");
 }
 void fast_forward(){
 	motor(lmotor,Bspeed);
 	motor(rmotor,Bspeed);
-	printf("moving forwards FASTER\n");
+	//printf("moving forwards FASTER\n");
 }
 void left_turn(){
 	motor(lmotor,-speed);
 	motor(rmotor,speed);
-	printf("turning left\n");
+	//printf("turning left\n");
 }
 void pivot_left_turn(){
 	motor(lmotor,0);
 	motor(rmotor,speed);
-	printf("turning left\n");
+	//printf("turning left\n");
 }
 void right_turn(){
 	motor(lmotor,speed);
 	motor(rmotor,-speed);
-	printf("turning right\n");
+	//printf("turning right\n");
 }
 void fast_right_turn(){
 	motor(lmotor,Bspeed);
@@ -314,7 +339,7 @@ void fast_right_turn(){
 void pivot_right_turn(){
 	motor(lmotor,speed);
 	motor(rmotor,0);
-	printf("turning right\n");
+	//printf("turning right\n");
 }
 void quickf(){
 	motor(lmotor,lilSpeed);
@@ -418,7 +443,7 @@ void drop(){
    msleep(250);
    wait();
    forward();
-   msleep(500);
+   msleep(1250);
    wait();
    open_claw();
    msleep(1000);
