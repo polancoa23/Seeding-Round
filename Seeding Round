@@ -1,0 +1,493 @@
+#include <kipr/wombat.h>
+//VARIABLES
+int closedOrange = 490;
+int closedGreen = 400;
+int closedBlue = 455;
+int opened=1300;
+int speed=50;
+int Bspeed = 90;
+int lilSpeed=15;
+int max = 485;
+int min=1750;
+int orangeVert = 1360;
+int greenVert = 1630;
+int blueVert = 1805;
+int lmotor = 0;
+int rmotor = 3;
+int side = 1;
+int vertical = 0;
+int claw = 1;
+int clawSideSens = 0;
+int clawFrontSens = 4;
+int frontSens = 5;
+int pole = 2500;
+int gWall = 2200;
+int lineL = 3800;
+int sideLight = 5;
+int tooClose = 2900;
+int tooFar = 2100;
+int midLight = 2;
+int count = 0;
+int turnPause = 1750;
+int cornerPause = 8500;
+int stackPause = 4250;
+int hydro = 2900;
+//FUNCTIONS
+void claw_down_orange();
+void claw_down_green();
+void claw_down_blue();
+void claw_down_min();
+void claw_up_max();
+void claw_up_orange();
+void close_claw_orange();
+void close_claw_green();
+void close_claw_blue();
+void open_claw();
+void back();
+void left_turn();
+void right_turn();
+void fast_right_turn();
+void quickf();
+void quickb();
+void quickd();
+void place();
+void forward();
+void fast_forward();
+void pivot_left_turn();
+void pivot_right_turn();
+void adjustL();
+void adjustR();
+void OGadjustL();
+void OGadjustR();
+void grab_and_up();
+void drop();
+void down_and_open();
+void knock_down();
+void super_grab();
+void on_ground();
+void wait();
+
+int main(){
+	//wait for light();
+	//shut_down_in(120.0);
+	enable_servos();
+    //STEP 1
+    open_claw();
+	claw_up_max(); 
+	printf("set-up complete!\n");
+    
+    //STEP 2
+    grab_and_up();
+    printf("picked up botguy\n");
+
+    //STEP 3
+    forward();
+    msleep(600);
+    wait();
+    right_turn();
+    msleep(turnPause);
+    wait();
+    claw_down_orange();
+    msleep(500);
+    printf("time to take him to the shelter\n");
+
+    //STEP 4
+    while(analog(clawFrontSens) <= gWall){
+    	forward();
+        if(analog(side) < tooFar){
+        	adjustR();
+		}
+        if(analog(side) > tooClose){
+			adjustL();
+		}
+    }
+    wait();
+    printf("arrived at shelter\n");
+
+    //STEP 5
+    drop();
+    msleep(500);
+    claw_up_max();
+    msleep(500);
+    printf("botguy now in shelter. time to go to the middle black line\n");
+    //STEP 6
+    OGadjustR();
+    wait();
+    //adjustR();
+    //wait();
+    pivot_left_turn();
+    msleep(550); // finish adjusting here
+    wait();
+    while(analog(sideLight) <= lineL){
+	back();
+    }
+    wait(); // at the line
+    left_turn();
+    msleep(turnPause);
+    wait();
+    printf("finally at black line. time to go to the hydrogen tank\n");
+    
+    //STEP 7
+    claw_down_orange();
+    msleep(500);
+    //open_claw();
+    //msleep(500);
+	fast_forward();
+    msleep(200);
+    wait();
+    left_turn();
+    msleep(200);
+    wait();
+    fast_forward();
+    msleep(5000); // ramming into it
+    wait();
+    fast_right_turn();
+    msleep(2000);
+    wait();
+    printf("knocked it down. we done for now\n");
+   
+    /*
+    //STEP 8
+    forward();
+    msleep(500);
+    wait();
+    printf("knocked it down. time to go to stack\n");
+    back();
+    msleep(1000);
+    left_turn();
+    msleep(turnPause);
+    wait();
+  
+    //STEP 9
+    forward();
+    msleep(cornerPause);//time to get to left corner
+    wait();
+    left_turn();
+    msleep(turnPause);
+    wait();
+    down_and_open();
+    forward();
+    msleep(stackPause);//time to get to stack
+    wait();
+    printf("arrived at stack. time to grab it and bring it to the base\n");
+
+    //STEP 10
+    close_claw_blue();
+    msleep(500);
+    msleep(1000);
+    back();
+    msleep(1000);
+    wait();
+    printf("grabbed it & brought it to base. time to put the rings on the ground in base\n");
+
+    //STEP 11
+    claw_up_max();
+    msleep(1000);
+    left_turn();
+    msleep(500);
+    wait();
+    on_ground();
+    msleep(1000);
+    printf("put the rings in base.\n");
+    
+    //STEP 12
+    back();
+    msleep(3000);
+    wait();
+    close_claw_green();
+    claw_down_green();
+    forward();
+    msleep(2000);
+    printf("all rings on the ground. we're done!");
+    */
+    
+    disable_servos();
+    ao();
+	return 0;
+}
+
+void claw_down_orange(){
+	int i = get_servo_position(0); // get vert pos
+  	while(i < orangeVert){
+    		set_servo_position(0,i);
+    		printf("going down\n");
+    		msleep(20);
+	    	i+=10;
+  	}
+	printf("finally at orange\n");
+}
+void claw_down_green(){
+	int i = get_servo_position(0);
+  	while(i < greenVert){
+    		set_servo_position(0,i);
+    		printf("going down\n");
+    		msleep(20);
+    		i+=10;
+  	}
+  	printf("finally at green\n");
+}
+void claw_up_max(){
+  	int i = get_servo_position(0);
+  	while(i>max){
+    		set_servo_position(0,i);
+    		printf("going up\n");
+    		msleep(20);
+    		i-=10;
+  	}
+  	printf("finally at max\n");
+}
+void claw_up_orange(){
+	int i = get_servo_position(0);
+	while(i>orangeVert){
+    		set_servo_position(0,i);
+    		msleep(20);
+    		printf("going up\n");
+    		i-=10;
+  	}
+  	printf("finally at orange\n");
+}
+void close_claw_orange(){
+	int i = get_servo_position(1);
+  	while(i > closedOrange){
+		set_servo_position(1,i);
+        	printf("closing\n");
+    		msleep(20);
+    		i-=5;
+  	}
+  	printf("finally closed on orange\n");
+}
+void close_claw_green(){
+	int i = get_servo_position(1);
+	while(i > closedGreen){
+		set_servo_position(1,i);
+		printf("closing\n");
+		msleep(20);
+		i-=10;
+	}
+	printf("finally closed on green\n");
+}
+void open_claw(){
+	int i = get_servo_position(1);
+	while(i < opened){
+		set_servo_position(1,i);
+    		printf("opening\n");
+    		msleep(20);
+    		i+=10;
+  	}
+	printf("finally opened\n");
+}
+void back(){
+	motor(lmotor,-speed);
+  	motor(rmotor,-speed);
+	printf("moving backwards\n");
+}
+void forward(){
+	motor(lmotor,speed);
+	motor(rmotor,speed);
+	printf("moving forwards\n");
+}
+void fast_forward(){
+	motor(lmotor,Bspeed);
+	motor(rmotor,Bspeed);
+	printf("moving forwards FASTER\n");
+}
+void left_turn(){
+	motor(lmotor,-speed);
+	motor(rmotor,speed);
+	printf("turning left\n");
+}
+void pivot_left_turn(){
+	motor(lmotor,0);
+	motor(rmotor,speed);
+	printf("turning left\n");
+}
+void right_turn(){
+	motor(lmotor,speed);
+	motor(rmotor,-speed);
+	printf("turning right\n");
+}
+void fast_right_turn(){
+	motor(lmotor,Bspeed);
+	motor(rmotor,-Bspeed);
+	printf("turning right FAST\n");
+}
+void pivot_right_turn(){
+	motor(lmotor,speed);
+	motor(rmotor,0);
+	printf("turning right\n");
+}
+void quickf(){
+	motor(lmotor,lilSpeed);
+	motor(rmotor,lilSpeed);
+	msleep(250);
+	printf("moving forward a bit\n");
+	//ao();
+}
+void quickb(){
+	motor(lmotor,-lilSpeed);
+	motor(rmotor,-lilSpeed);
+	msleep(250);
+	printf("moving backward a bit\n");
+	//ao();
+}
+void quickd(){
+	set_servo_position(0,get_servo_position(0)+30);
+	msleep(20);
+	printf("going down a bit\n");
+}
+void place(){
+	int i = 0;
+	while(i<15){
+		quickf();
+    		msleep(50);
+    		ao();
+    		msleep(50);
+    		printf("forward a bit\n");
+    		quickd();
+    		msleep(50);
+    		printf("down a bit\n");
+    		quickb();
+    		msleep(50);
+    		printf("backward a bit\n");
+    		ao();
+    		msleep(50);
+    		quickd();
+    		msleep(50);
+    		printf("down a bit\n");
+    		i++;
+  	}
+}
+void adjustL(){
+	int i = 0;
+	while(i<3){
+		pivot_left_turn();
+		msleep(350);
+		pivot_right_turn();
+		msleep(300);
+        pivot_left_turn();
+        msleep(100);
+        wait();
+		i++;
+	}
+}
+void adjustR(){
+	int i = 0;
+	while(i<3){
+		pivot_right_turn();
+		msleep(350);
+		pivot_left_turn();
+		msleep(300);
+        pivot_right_turn();
+        msleep(100);
+        wait();
+		i++;
+	}
+}
+void OGadjustL(){
+	int i = 0;
+	while(i<3){
+		pivot_left_turn();
+		msleep(350);
+		pivot_right_turn();
+		msleep(300);
+        wait();
+		i++;
+	}
+}
+void OGadjustR(){
+	int i = 0;
+	while(i<3){
+		pivot_right_turn();
+		msleep(350);
+		pivot_left_turn();
+		msleep(300);
+        wait();
+		i++;
+	}
+}
+void grab_and_up(){
+    claw_down_green();
+    msleep(1000);
+    close_claw_green();
+    msleep(1000);
+    claw_up_max();
+    msleep(1000);
+}
+void drop(){
+   right_turn();
+   msleep(250);
+   wait();
+   forward();
+   msleep(500);
+   wait();
+   open_claw();
+   msleep(1000);
+   back();
+   msleep(2000);
+   wait();
+   close_claw_blue();
+   msleep(1000);
+}
+void knock_down(){
+   claw_down_green();
+   msleep(1000);
+   left_turn();
+   msleep(1300);
+   wait();
+   claw_up_max();
+   msleep(1000);
+}
+void down_and_open(){
+   claw_down_blue();
+   msleep(500);
+   open_claw();
+   msleep(500);
+}
+void super_grab(){
+   open_claw();
+   msleep(1000);
+   claw_down_blue();
+   msleep(1000);
+   close_claw_blue();
+   msleep(1000);
+}
+void on_ground(){
+   claw_down_min();
+   msleep(1000);
+   open_claw();
+   msleep(1000);
+}
+void wait(){
+   ao();
+   msleep(500);
+}
+void claw_down_blue(){
+	int i = get_servo_position(0);
+  	while(i < blueVert){
+    		set_servo_position(0,i);
+    		printf("going down\n");
+    		msleep(20);
+    		i+=10;
+  	}
+  	printf("finally at blue\n");
+}
+void close_claw_blue(){
+	int i = get_servo_position(1);
+	while(i > closedBlue){
+		set_servo_position(1,i);
+		printf("closing\n");
+		msleep(20);
+		i-=10;
+	}
+	printf("finally closed on blue\n");
+}
+void claw_down_min(){
+	int i = get_servo_position(0);
+  	while(i < min){
+    		set_servo_position(0,i);
+    		printf("going down\n");
+    		msleep(20);
+    		i+=10;
+  	}
+  	printf("finally at ground\n");
+}
