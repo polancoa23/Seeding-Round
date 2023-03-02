@@ -1,9 +1,9 @@
 #include <kipr/wombat.h>
 //VARIABLES
-int closedOrange = 490;
-int closedGreen = 400;
-int closedBlue = 455;
-int opened=1300;
+int closedOrange = 200;
+int closedGreen = 200;
+int closedBlue = 200;
+int opened=1100;
 int speed=50;
 int Bspeed = 90;
 int lilSpeed=15;
@@ -21,14 +21,15 @@ int clawSideSens = 0;
 int clawFrontSens = 4;
 int frontSens = 5;
 int pole = 2500;
-int gWall = 2200;
+int gWall = 1750;
 int lineL = 3800;
 int sideLight = 5;
-int tooClose = 2900;
-int tooFar = 2200;
+int tooClose = 2800;
+int tooFar = 2350;
 int midLight = 2;
 int count = 0;
-int turnPause = 1750;
+int turnPause = 2500;
+int ringTurnPause = 3000;
 int cornerPause = 8500;
 int stackPause = 4250;
 int hydro = 2900;
@@ -72,21 +73,21 @@ int main(){
 	shut_down_in(120.0);
 	enable_servos();
     //STEP 1
-    open_claw();
+    //open_claw();
 	claw_up_max(); 
 	printf("set-up complete!\n");
     // maybe step
     close_claw_green();
     msleep(100);
     left_turn();
-    msleep(turnPause);
+    msleep(ringTurnPause);
     wait();
     //claw down to orange
     claw_down_orange();
     msleep(500);
   
     //right turn
-    right_turn();
+    fast_right_turn();
     msleep(1000);
     wait();
     // claw up
@@ -94,7 +95,7 @@ int main(){
     msleep(500);
     // face botguy
     right_turn();
-    msleep(800);
+    msleep(1000);
     wait();
     open_claw();
     msleep(100);
@@ -112,20 +113,32 @@ int main(){
     claw_down_orange();
     msleep(500);
     printf("time to take him to the shelter\n");
-
+    forward(); // this is to avoid the front claw sensor from detecting the horizontal pole
+    msleep(10000);
+    wait();
     //STEP 4
-    while(analog(clawFrontSens) <= gWall || count <= 300){
+    while(analog(clawFrontSens) <= gWall){
     	forward();
-        count++;
+        //count++;
         if(analog(side) < tooFar){
-        	adjustR();
-                count++;
+        	//adjustR();
+            pivot_right_turn();
+                //count++;
 		}
         if(analog(side) > tooClose){
-			adjustL();
-                        count++;
+			//adjustL();
+            pivot_left_turn();
+                        //count++;
 		}
+        //printf("Count = %d",count);
     }
+    /*
+    if(count >= 18000){
+        back();
+        msleep(4000);
+        wait();
+    }
+    */
     wait();
     printf("arrived at shelter\n");
 
@@ -433,6 +446,9 @@ void OGadjustR(){
 void grab_and_up(){
     claw_down_green();
     msleep(1000);
+    forward();
+    msleep(500);
+    wait();
     close_claw_green();
     msleep(1000);
     claw_up_max();
