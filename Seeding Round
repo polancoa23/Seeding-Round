@@ -1,9 +1,9 @@
 #include <kipr/wombat.h>
 //VARIABLES
-int closedOrange = 200;
-int closedGreen = 200;
-int closedBlue = 200;
-int opened=1100;
+int closedOrange = 1024;
+int closedGreen = 1024;
+int closedBlue = 1024;
+int opened=1800;
 int speed=50;
 int Bspeed = 90;
 int lilSpeed=15;
@@ -24,7 +24,7 @@ int pole = 2500;
 int gWall = 1750;
 int lineL = 3800;
 int sideLight = 5;
-int tooClose = 2800;
+int tooClose = 2600;
 int tooFar = 2350;
 int midLight = 2;
 int count = 0;
@@ -105,7 +105,7 @@ int main(){
 
     //STEP 3
     forward();
-    msleep(600);
+    msleep(1000);
     wait();
     right_turn();
     msleep(turnPause);
@@ -113,19 +113,30 @@ int main(){
     claw_down_orange();
     msleep(500);
     printf("time to take him to the shelter\n");
-    forward(); // this is to avoid the front claw sensor from detecting the horizontal pole
-    msleep(10000);
-    wait();
+
     //STEP 4
+    forward();
+    msleep(1500);
+    wait();
+    right_turn();
+    msleep(100);
+    wait();
+    forward();
+    msleep(7000);
+    wait();
+        
     while(analog(clawFrontSens) <= gWall){
     	forward();
         //count++;
+        if(analog(sideLight) >= lineL){
+            gWall = 10;
+        }
         if(analog(side) < tooFar){
         	//adjustR();
             pivot_right_turn();
                 //count++;
 		}
-        if(analog(side) > tooClose){
+        if((analog(side) > tooClose) || (analog(side) < 2000)){
 			//adjustL();
             pivot_left_turn();
                         //count++;
@@ -154,7 +165,7 @@ int main(){
     //adjustR();
     //wait();
     pivot_left_turn();
-    msleep(500); // finish adjusting here
+    msleep(175); // finish adjusting here
     wait();
     while(analog(sideLight) <= lineL){
 	back();
@@ -173,11 +184,15 @@ int main(){
 	fast_forward();
     msleep(200);
     wait();
-    left_turn();
-    msleep(200);
+    right_turn();
+    msleep(250);
     wait();
     fast_forward();
-    msleep(5000); // ramming into it
+    msleep(7000); // ramming into it
+    wait();
+    claw_down_green();
+    fast_forward();
+    msleep(1000);
     wait();
     fast_right_turn();
     msleep(2000);
@@ -459,7 +474,7 @@ void drop(){
    msleep(250);
    wait();
    forward();
-   msleep(1250);
+   msleep(3000);
    wait();
    open_claw();
    msleep(1000);
